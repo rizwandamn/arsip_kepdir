@@ -10,9 +10,36 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] != 'admin') {
     exit();
 }
 
-// Query untuk mengambil semua dokumen dari database
-$query = "SELECT * FROM dokumen ORDER BY created_at DESC";
+// Siapkan variabel filter
+$kategori_filter = isset($_POST['kategori']) ? $_POST['kategori'] : '';
+$jenis_filter = isset($_POST['jenis']) ? $_POST['jenis'] : '';
+$search_term = isset($_POST['search']) ? $_POST['search'] : '';
+
+// Cek apakah ada pencarian atau filter
+$is_searching = !empty($search_term) || !empty($kategori_filter) || !empty($jenis_filter);
+
+// Query untuk mengambil semua dokumen dengan filter
+$query = "SELECT * FROM dokumen WHERE 1=1"; // 1=1 untuk memudahkan penambahan kondisi
+
+// Tambahkan filter kategori jika ada
+if ($kategori_filter) {
+    $query .= " AND kategori = '$kategori_filter'";
+}
+
+// Tambahkan filter jenis jika ada
+if ($jenis_filter) {
+    $query .= " AND jenis = '$jenis_filter'";
+}
+
+// Tambahkan pencarian
+if ($search_term) {
+    $query .= " AND (title LIKE '%$search_term%' OR no_surat LIKE '%$search_term%')";
+}
+
+$query .= " ORDER BY created_at DESC"; // Urutkan berdasarkan tanggal
+
 $result = mysqli_query($conn, $query);
+
 ?>
 
 <!DOCTYPE html>
@@ -33,6 +60,34 @@ $result = mysqli_query($conn, $query);
                 <?= htmlspecialchars($_GET['message']); ?>
             </div>
         <?php endif; ?>
+
+        <!-- Form sortir kategori, jenis dokumen dan pencarian -->
+        <form method="post" action="">
+            <div class="row mb-4">
+                <div class="col">
+                    <select name="kategori" class="form-select">
+                        <option value="">Semua Kategori</option>
+                        <option value="pendidikan" <?= $kategori_filter == 'pendidikan' ? 'selected' : ''; ?>>Pendidikan</option>
+                        <option value="penelitian" <?= $kategori_filter == 'penelitian' ? 'selected' : ''; ?>>Penelitian</option>
+                        <option value="pengabdian" <?= $kategori_filter == 'pengabdian' ? 'selected' : ''; ?>>Pengabdian</option>
+                        <option value="lainnya" <?= $kategori_filter == 'lainnya' ? 'selected' : ''; ?>>Lainnya</option>
+                    </select>
+                </div>
+                <div class="col">
+                    <select name="jenis" class="form-select">
+                        <option value="">Semua Jenis</option>
+                        <option value="surat_keputusan" <?= $jenis_filter == 'surat_keputusan' ? 'selected' : ''; ?>>Surat Keputusan</option>
+                        <option value="surat_tugas" <?= $jenis_filter == 'surat_tugas' ? 'selected' : ''; ?>>Surat Tugas</option>
+                    </select>
+                </div>
+                <div class="col">
+                    <input type="text" name="search" class="form-control" placeholder="Cari dokumen..." value="<?= htmlspecialchars($search_term); ?>">
+                </div>
+                <div class="col">
+                    <button type="submit" class="btn btn-primary">Cari & Sortir</button>
+                </div>
+            </div>
+        </form>
 
         <!-- Tombol tambah dokumen -->
         <a href="upload_dokumen.php" class="btn btn-primary mb-3">Tambah Dokumen</a>
