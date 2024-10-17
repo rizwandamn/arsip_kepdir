@@ -2,7 +2,7 @@
 // session_start();
 require 'db.php'; // Koneksi ke database
 require 'session.php';
-checkLogin();
+
 
 // Ambil ID dokumen dari URL
 if (isset($_GET['id'])) {
@@ -43,4 +43,6 @@ if (isset($_GET['id'])) {
 } else {
     echo "<div class='alert alert-danger'>ID dokumen tidak diberikan.</div>";
 }
+
+
 ?>

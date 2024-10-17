@@ -91,8 +91,14 @@ if (!$result) {
                                 <p><strong>Kategori:</strong> <?= htmlspecialchars($row['kategori']); ?></p>
                                 <p><strong>Jenis:</strong> <?= htmlspecialchars($row['jenis']); ?></p>
                                 <p><strong>Tanggal:</strong> <?= htmlspecialchars($row['tanggal_surat']); ?></p>
-                                <a href="preview_dokumen.php?id=<?= $row['id_dokumen']; ?>" class="btn btn-primary">Preview</a>
-                                <a href="download_dokumen.php?id=<?= $row['id_dokumen']; ?>" class="btn btn-success">Download</a>
+                                  <!-- Tombol Preview dan Download bisa digunakan tanpa login -->
+                                   <a href="preview_dokumen.php?id=<?= $row['id_dokumen']; ?>>&from=main" class="btn btn-primary">Preview</a>
+                                   <a href="download_dokumen.php?id=<?= $row['id_dokumen']; ?>" class="btn btn-success">Download</a>
+
+                                
+                                <!-- Tombol Tandai -->
+                                <a href="mark_dokumen.php?id=<?= $row['id_dokumen']; ?>" class="btn btn-warning" 
+                                   onclick="return confirmTandai()">Tandai</a>
                             </div>
                         </div>
                     </div>
@@ -109,5 +115,19 @@ if (!$result) {
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Fungsi untuk memeriksa apakah pengguna sudah login sebelum menandai dokumen
+        function confirmTandai() {
+            <?php if (!isset($_SESSION['username'])): ?>
+                // Jika pengguna belum login, arahkan ke halaman login
+                alert("Anda harus login terlebih dahulu untuk menandai dokumen.");
+                window.location.href = "login.php";
+                return false; // Cegah link untuk langsung menandai
+            <?php else: ?>
+                return true; // Lanjutkan jika pengguna sudah login
+            <?php endif; ?>
+        }
+    </script>
 </body>
 </html>

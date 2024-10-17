@@ -2,7 +2,7 @@
 // session_start();
 require 'db.php'; // Koneksi ke database
 require 'session.php';
-checkLogin() ;
+// checkLogin() ;
 
 // Ambil ID dokumen dari URL
 if (isset($_GET['id'])) {
@@ -28,8 +28,21 @@ if (isset($_GET['id'])) {
     exit();
 }
 
-// Cek role pengguna untuk menentukan link kembali
-$dashboard_url = ($_SESSION['role'] === 'admin') ? 'dashboard_admin.php' : 'dashboard_dosen.php';
+// Cek dari mana pengguna datang
+$from_page = isset($_GET['from']) ? $_GET['from'] : 'main';
+
+// Tentukan URL kembali sesuai dengan halaman yang diakses
+switch ($from_page) {
+    case 'dosen':
+        $dashboard_url = 'dashboard_dosen.php';
+        break;
+    case 'admin':
+        $dashboard_url = 'dashboard_admin.php';
+        break;
+    default: // 'main'
+        $dashboard_url = 'index.php';
+        break;
+}
 
 ?>
 
