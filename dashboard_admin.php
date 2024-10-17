@@ -62,7 +62,7 @@ $result = mysqli_query($conn, $query);
                         <td><?= ucfirst($row['jenis']); ?></td>
                         <td>
                             <!-- Tombol aksi -->
-                            <a href="preview_dokumen.php?id=<?= $row['id_dokumen']; ?>" class="btn btn-info btn-sm">Preview</a>
+                            <a href="preview_dokumen.php?id=<?= $row['id_dokumen']; ?>&from=admin" class="btn btn-info btn-sm">Preview</a>
                             <a href="download_dokumen.php?id=<?= $row['id_dokumen']; ?>" class="btn btn-success btn-sm">Download</a>
                             <a href="edit_dokumen.php?id=<?= $row['id_dokumen']; ?>" class="btn btn-warning btn-sm">Edit</a>
                             <a href="delete_dokumen.php?id=<?= $row['id_dokumen']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Apakah Anda yakin ingin menghapus dokumen ini?');">Hapus</a>

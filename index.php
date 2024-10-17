@@ -145,7 +145,7 @@ if (!$result) {
                                 <p><strong>Jenis:</strong> <?= htmlspecialchars($row['jenis']); ?></p>
                                 <p><strong>Tanggal:</strong> <?= htmlspecialchars($row['tanggal_surat']); ?></p>
                                   <!-- Tombol Preview dan Download bisa digunakan tanpa login -->
-                                   <a href="preview_dokumen.php?id=<?= $row['id_dokumen']; ?>>&from=main" class="btn btn-primary">Preview</a>
+                                   <a href="preview_dokumen.php?id=<?= $row['id_dokumen']; ?>&from=main" class="btn btn-primary">Preview</a>
                                    <a href="download_dokumen.php?id=<?= $row['id_dokumen']; ?>" class="btn btn-success">Download</a>
 
                                 

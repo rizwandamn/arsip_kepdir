@@ -127,7 +127,7 @@ if (!$result) {
                                 <p class="card-text"><strong>Jenis:</strong> <?= ucfirst(htmlspecialchars($row['jenis'])); ?></p>
 
                                 <!-- Tombol aksi -->
-                                <a href="preview_dokumen.php?id=<?= $row['id_dokumen']; ?>" class="btn btn-info btn-sm">Preview</a>
+                                <a href="preview_dokumen.php?id=<?= $row['id_dokumen']; ?>&from=dosen" class="btn btn-info btn-sm">Preview</a>
                                 <a href="download_dokumen.php?id=<?= $row['id_dokumen']; ?>" class="btn btn-success btn-sm">Download</a>
 
                                 <!-- Tombol Tandai/Batal Tandai -->

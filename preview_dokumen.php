@@ -1,8 +1,14 @@
 <?php
-// session_start();
+session_start();
 require 'db.php'; // Koneksi ke database
 require 'session.php';
 // checkLogin() ;
+
+// Pastikan pengguna sudah login
+if (!isset($_SESSION['role'])) {
+    header("Location: login.php");
+    exit();
+}
 
 // Ambil ID dokumen dari URL
 if (isset($_GET['id'])) {
@@ -28,11 +34,12 @@ if (isset($_GET['id'])) {
     exit();
 }
 
-// Cek dari mana pengguna datang
-$from_page = isset($_GET['from']) ? $_GET['from'] : 'main';
+// Tentukan URL kembali sesuai dengan role pengguna
+$role = $_SESSION['role'];
+$dashboard_url = '';
 
 // Tentukan URL kembali sesuai dengan halaman yang diakses
-switch ($from_page) {
+switch ($role) {
     case 'dosen':
         $dashboard_url = 'dashboard_dosen.php';
         break;
