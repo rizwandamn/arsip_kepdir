@@ -16,25 +16,41 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] != 'dosen') {
     exit();
 }
 
+// Ambil ID user yang sedang login
+$userId = $_SESSION['id_user'];
+
 // Siapkan variabel filter
 $kategori_filter = isset($_POST['kategori']) ? $_POST['kategori'] : '';
 $jenis_filter = isset($_POST['jenis']) ? $_POST['jenis'] : '';
+$search_term = isset($_POST['search']) ? $_POST['search'] : '';
 
-// Query untuk mengambil semua dokumen dengan filter
-$query = "SELECT * FROM dokumen WHERE 1=1";
+// Query untuk mengambil dokumen yang DITANDAI oleh dosen
+$query = "SELECT d.* FROM dokumen d 
+          JOIN marked_dokumen md ON d.id_dokumen = md.id_dokumen
+          WHERE md.id_user = ?";
 
 // Tambahkan filter kategori jika ada
 if ($kategori_filter) {
-    $query .= " AND kategori = '$kategori_filter'";
+    $query .= " AND d.kategori = '$kategori_filter'";
 }
 
 // Tambahkan filter jenis jika ada
 if ($jenis_filter) {
-    $query .= " AND jenis = '$jenis_filter'";
+    $query .= " AND d.jenis = '$jenis_filter'";
 }
 
-$query .= " ORDER BY created_at DESC";
-$result = mysqli_query($conn, $query);
+// Tambahkan filter pencarian berdasarkan judul atau nomor surat
+if ($search_term) {
+    $query .= " AND (d.title LIKE '%$search_term%' OR d.no_surat LIKE '%$search_term%')";
+}
+
+$query .= " ORDER BY d.created_at DESC";
+
+// Siapkan statement
+$stmt = mysqli_prepare($conn, $query);
+mysqli_stmt_bind_param($stmt, 'i', $userId); // Bind hanya ID user
+mysqli_stmt_execute($stmt);
+$result = mysqli_stmt_get_result($stmt);
 
 if (!$result) {
     die("Query error: " . mysqli_error($conn));
@@ -54,12 +70,12 @@ if (!$result) {
     <div class="container">
         <h1 class="mt-4">Dashboard Dosen</h1>
 
-        <!-- Form sortir kategori dan jenis surat -->
+        <!-- Form sortir kategori, jenis surat dan search -->
         <form method="post" action="">
             <div class="row mb-4">
                 <div class="col">
                     <select name="kategori" class="form-select">
-                        <option value="">Semua</option>
+                        <option value="">Semua Kategori</option>
                         <option value="pendidikan" <?= $kategori_filter == 'pendidikan' ? 'selected' : ''; ?>>Pendidikan</option>
                         <option value="penelitian" <?= $kategori_filter == 'penelitian' ? 'selected' : ''; ?>>Penelitian</option>
                         <option value="pengabdian" <?= $kategori_filter == 'pengabdian' ? 'selected' : ''; ?>>Pengabdian</option>
@@ -68,72 +84,58 @@ if (!$result) {
                 </div>
                 <div class="col">
                     <select name="jenis" class="form-select">
-                        <option value="">Semua</option>
+                        <option value="">Semua Jenis</option>
                         <option value="surat_keputusan" <?= $jenis_filter == 'surat_keputusan' ? 'selected' : ''; ?>>Surat Keputusan</option>
                         <option value="surat_tugas" <?= $jenis_filter == 'surat_tugas' ? 'selected' : ''; ?>>Surat Tugas</option>
                     </select>
                 </div>
                 <div class="col">
-                    <button type="submit" class="btn btn-primary">Sortir</button>
+                    <input type="text" name="search" class="form-control" placeholder="Cari dokumen..." value="<?= htmlspecialchars($search_term); ?>">
+                </div>
+                <div class="col">
+                    <button type="submit" class="btn btn-primary">Cari & Sortir</button>
                 </div>
             </div>
         </form>
 
-        <!-- Tabel daftar dokumen -->
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>No</th>
-                    <th>Judul</th>
-                    <th>No. Surat</th>
-                    <th>Tanggal Surat</th>
-                    <th>Kategori</th>
-                    <th>Jenis</th>
-                    <th>Aksi</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php if (mysqli_num_rows($result) > 0): ?>
-                    <?php $no = 1; while ($row = mysqli_fetch_assoc($result)): ?>
-                    <tr>
-                        <td><?= $no++; ?></td>
-                        <td><?= $row['title']; ?></td>
-                        <td><?= $row['no_surat']; ?></td>
-                        <td><?= $row['tanggal_surat']; ?></td>
-                        <td><?= ucfirst($row['kategori']); ?></td>
-                        <td><?= ucfirst($row['jenis']); ?></td>
-                        <td>
-                            <!-- Tombol aksi -->
-                            <a href="preview_dokumen.php?id=<?= $row['id_dokumen']; ?>" class="btn btn-info btn-sm">Preview</a>
-                            <a href="download_dokumen.php?id=<?= $row['id_dokumen']; ?>" class="btn btn-success btn-sm">Download</a>
-                            <!-- Cek apakah dokumen sudah ditandai oleh user -->
-                            <?php
-                            $userId = $_SESSION['id_user'];
-                            $docId = $row['id_dokumen'];
+        <!-- Menampilkan dokumen dalam bentuk kartu -->
+        <div class="row">
+            <?php if (mysqli_num_rows($result) > 0): ?>
+                <?php while ($row = mysqli_fetch_assoc($result)): ?>
+                    <div class="col-md-4">
+                        <div class="card mb-4 shadow-sm">
+                            <div class="card-body">
+                                <h5 class="card-title"><?= htmlspecialchars($row['title']); ?></h5>
+                                <p class="card-text"><strong>No. Surat:</strong> <?= htmlspecialchars($row['no_surat']); ?></p>
+                                <p class="card-text"><strong>Tanggal Surat:</strong> <?= htmlspecialchars($row['tanggal_surat']); ?></p>
+                                <p class="card-text"><strong>Kategori:</strong> <?= ucfirst(htmlspecialchars($row['kategori'])); ?></p>
+                                <p class="card-text"><strong>Jenis:</strong> <?= ucfirst(htmlspecialchars($row['jenis'])); ?></p>
 
-                            $checkQuery = "SELECT * FROM marked_dokumen WHERE id_user = ? AND id_dokumen = ?";
-                            $checkStmt = mysqli_prepare($conn, $checkQuery);
-                            mysqli_stmt_bind_param($checkStmt, 'ii', $userId, $docId);
-                            mysqli_stmt_execute($checkStmt);
-                            $checkResult = mysqli_stmt_get_result($checkStmt);
+                                <!-- Tombol aksi -->
+                                <a href="preview_dokumen.php?id=<?= $row['id_dokumen']; ?>" class="btn btn-info btn-sm">Preview</a>
+                                <a href="download_dokumen.php?id=<?= $row['id_dokumen']; ?>" class="btn btn-success btn-sm">Download</a>
 
-                            $isMarked = mysqli_num_rows($checkResult) > 0; // True jika sudah ditandai
-                            ?>
+                                <!-- Tombol Tandai/Batal Tandai -->
+                                <?php
+                                $isMarkedQuery = "SELECT * FROM marked_dokumen WHERE id_user = ? AND id_dokumen = ?";
+                                $isMarkedStmt = mysqli_prepare($conn, $isMarkedQuery);
+                                mysqli_stmt_bind_param($isMarkedStmt, 'ii', $userId, $row['id_dokumen']);
+                                mysqli_stmt_execute($isMarkedStmt);
+                                $isMarkedResult = mysqli_stmt_get_result($isMarkedStmt);
 
-                            <!-- Tambahkan tombol "Tandai/Batal Tandai" -->
-                            <a href="mark_dokumen.php?id=<?= $docId; ?>" class="btn btn-secondary btn-sm">
-                                <?= $isMarked ? 'Batal Tandai' : 'Tandai'; ?>
-                            </a>
-                        </td>
-                    </tr>
-                    <?php endwhile; ?>
-                <?php else: ?>
-                    <tr>
-                        <td colspan="7" class="text-center">Tidak ada dokumen</td>
-                    </tr>
-                <?php endif; ?>
-            </tbody>
-        </table>
+                                $isMarked = mysqli_num_rows($isMarkedResult) > 0;
+                                ?>
+                                <a href="mark_dokumen.php?id=<?= $row['id_dokumen']; ?>" class="btn btn-secondary btn-sm">
+                                    <?= $isMarked ? 'Batal Tandai' : 'Tandai'; ?>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                <?php endwhile; ?>
+            <?php else: ?>
+                <p class="text-center">Tidak ada dokumen yang sesuai dengan pencarian atau filter.</p>
+            <?php endif; ?>
+        </div>
 
         <!-- Tombol logout -->
         <a href="logout.php" class="btn btn-danger">Logout</a>
