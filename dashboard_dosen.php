@@ -24,31 +24,46 @@ $kategori_filter = isset($_POST['kategori']) ? $_POST['kategori'] : '';
 $jenis_filter = isset($_POST['jenis']) ? $_POST['jenis'] : '';
 $search_term = isset($_POST['search']) ? $_POST['search'] : '';
 
-// Query untuk mengambil dokumen yang DITANDAI oleh dosen
-$query = "SELECT d.* FROM dokumen d 
-          JOIN marked_dokumen md ON d.id_dokumen = md.id_dokumen
-          WHERE md.id_user = ?";
+// Cek apakah ada pencarian atau filter
+$is_searching = !empty($search_term) || !empty($kategori_filter) || !empty($jenis_filter);
 
-// Tambahkan filter kategori jika ada
-if ($kategori_filter) {
-    $query .= " AND d.kategori = '$kategori_filter'";
+// Jika ada pencarian atau filter, tampilkan dokumen hasil pencarian
+if ($is_searching) {
+    // Query untuk menampilkan semua dokumen (baik yang ditandai maupun tidak)
+    $query = "SELECT d.* FROM dokumen d 
+              LEFT JOIN marked_dokumen md ON d.id_dokumen = md.id_dokumen 
+              AND md.id_user = ?
+              WHERE (d.title LIKE ? OR d.no_surat LIKE ?)";
+
+    // Tambahkan filter kategori jika ada
+    if ($kategori_filter) {
+        $query .= " AND d.kategori = '$kategori_filter'";
+    }
+
+    // Tambahkan filter jenis jika ada
+    if ($jenis_filter) {
+        $query .= " AND d.jenis = '$jenis_filter'";
+    }
+
+    $query .= " ORDER BY d.created_at DESC";
+
+    // Siapkan statement
+    $search_term_like = '%' . $search_term . '%'; // Untuk pencarian LIKE
+    $stmt = mysqli_prepare($conn, $query);
+    mysqli_stmt_bind_param($stmt, 'iss', $userId, $search_term_like, $search_term_like);
+} else {
+    // Jika tidak ada pencarian atau filter, tampilkan dokumen yang hanya ditandai oleh user
+    $query = "SELECT d.* FROM dokumen d 
+              JOIN marked_dokumen md ON d.id_dokumen = md.id_dokumen
+              WHERE md.id_user = ?
+              ORDER BY d.created_at DESC";
+
+    // Siapkan statement
+    $stmt = mysqli_prepare($conn, $query);
+    mysqli_stmt_bind_param($stmt, 'i', $userId); // Bind hanya ID user
 }
 
-// Tambahkan filter jenis jika ada
-if ($jenis_filter) {
-    $query .= " AND d.jenis = '$jenis_filter'";
-}
-
-// Tambahkan filter pencarian berdasarkan judul atau nomor surat
-if ($search_term) {
-    $query .= " AND (d.title LIKE '%$search_term%' OR d.no_surat LIKE '%$search_term%')";
-}
-
-$query .= " ORDER BY d.created_at DESC";
-
-// Siapkan statement
-$stmt = mysqli_prepare($conn, $query);
-mysqli_stmt_bind_param($stmt, 'i', $userId); // Bind hanya ID user
+// Eksekusi query
 mysqli_stmt_execute($stmt);
 $result = mysqli_stmt_get_result($stmt);
 
