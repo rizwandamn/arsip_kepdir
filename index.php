@@ -6,9 +6,35 @@ session_start();
 // Koneksi ke database
 include 'db.php';
 
-// Ambil dokumen terbaru dari database
-$query = "SELECT * FROM dokumen ORDER BY created_at DESC LIMIT 5";
+// Siapkan variabel untuk filter
+$kategori_filter = isset($_POST['kategori']) ? $_POST['kategori'] : '';
+$jenis_filter = isset($_POST['jenis']) ? $_POST['jenis'] : '';
+
+// Ambil dokumen terbaru dari database dengan filter
+$query = "SELECT * FROM dokumen WHERE 1=1";
+
+// Tambahkan filter kategori jika ada
+if ($kategori_filter) {
+    $query .= " AND kategori = ?";
+}
+
+// Tambahkan filter jenis jika ada
+if ($jenis_filter) {
+    $query .= " AND jenis = ?";
+}
+
+$query .= " ORDER BY created_at DESC LIMIT 5";
 $stmt = mysqli_prepare($conn, $query);
+
+// Bind parameter jika ada filter
+if ($kategori_filter && $jenis_filter) {
+    mysqli_stmt_bind_param($stmt, 'ss', $kategori_filter, $jenis_filter);
+} elseif ($kategori_filter) {
+    mysqli_stmt_bind_param($stmt, 's', $kategori_filter);
+} elseif ($jenis_filter) {
+    mysqli_stmt_bind_param($stmt, 's', $jenis_filter);
+}
+
 mysqli_stmt_execute($stmt);
 $result = mysqli_stmt_get_result($stmt);
 
@@ -74,6 +100,32 @@ if (!$result) {
         <form method="post" action="search.php" class="input-group mb-4">
             <input type="text" name="search" class="form-control" placeholder="Cari dokumen..." required>
             <button class="btn btn-primary" type="submit">Cari</button>
+        </form>
+    </div>
+
+    <!-- Filter Form -->
+    <div class="container mb-4">
+        <form method="post" action="">
+            <div class="row">
+                <div class="col">
+                    <select name="kategori" class="form-select">
+                        <option value="">Semua</option>
+                        <option value="pendidikan">Pendidikan</option>
+                        <option value="penelitian">Penelitian</option>
+                        <option value="pengabdian">Pengabdian</option>
+                    </select>
+                </div>
+                <div class="col">
+                    <select name="jenis" class="form-select">
+                        <option value="">Semua</option>
+                        <option value="surat_keputusan">Surat Keputusan</option>
+                        <option value="surat_tugas">Surat Tugas</option>
+                    </select>
+                </div>
+                <div class="col">
+                    <button class="btn btn-primary" type="submit">Sortir</button>
+                </div>
+            </div>
         </form>
     </div>
 
