@@ -113,6 +113,7 @@ if (!$result) {
                         <option value="pendidikan">Pendidikan</option>
                         <option value="penelitian">Penelitian</option>
                         <option value="pengabdian">Pengabdian</option>
+                        <option value="lainnya">Lainnya</option>
                     </select>
                 </div>
                 <div class="col">

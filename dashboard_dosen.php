@@ -16,8 +16,24 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] != 'dosen') {
     exit();
 }
 
-// Query untuk mengambil semua dokumen dari database
-$query = "SELECT * FROM dokumen ORDER BY created_at DESC";
+// Siapkan variabel filter
+$kategori_filter = isset($_POST['kategori']) ? $_POST['kategori'] : '';
+$jenis_filter = isset($_POST['jenis']) ? $_POST['jenis'] : '';
+
+// Query untuk mengambil semua dokumen dengan filter
+$query = "SELECT * FROM dokumen WHERE 1=1";
+
+// Tambahkan filter kategori jika ada
+if ($kategori_filter) {
+    $query .= " AND kategori = '$kategori_filter'";
+}
+
+// Tambahkan filter jenis jika ada
+if ($jenis_filter) {
+    $query .= " AND jenis = '$jenis_filter'";
+}
+
+$query .= " ORDER BY created_at DESC";
 $result = mysqli_query($conn, $query);
 
 if (!$result) {
@@ -37,6 +53,31 @@ if (!$result) {
 <body>
     <div class="container">
         <h1 class="mt-4">Dashboard Dosen</h1>
+
+        <!-- Form sortir kategori dan jenis surat -->
+        <form method="post" action="">
+            <div class="row mb-4">
+                <div class="col">
+                    <select name="kategori" class="form-select">
+                        <option value="">Semua</option>
+                        <option value="pendidikan" <?= $kategori_filter == 'pendidikan' ? 'selected' : ''; ?>>Pendidikan</option>
+                        <option value="penelitian" <?= $kategori_filter == 'penelitian' ? 'selected' : ''; ?>>Penelitian</option>
+                        <option value="pengabdian" <?= $kategori_filter == 'pengabdian' ? 'selected' : ''; ?>>Pengabdian</option>
+                        <option value="lainnya" <?= $kategori_filter == 'lainnya' ? 'selected' : ''; ?>>Lainnya</option>
+                    </select>
+                </div>
+                <div class="col">
+                    <select name="jenis" class="form-select">
+                        <option value="">Semua</option>
+                        <option value="surat_keputusan" <?= $jenis_filter == 'surat_keputusan' ? 'selected' : ''; ?>>Surat Keputusan</option>
+                        <option value="surat_tugas" <?= $jenis_filter == 'surat_tugas' ? 'selected' : ''; ?>>Surat Tugas</option>
+                    </select>
+                </div>
+                <div class="col">
+                    <button type="submit" class="btn btn-primary">Sortir</button>
+                </div>
+            </div>
+        </form>
 
         <!-- Tabel daftar dokumen -->
         <table class="table table-striped">
