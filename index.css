@@ -1,0 +1,178 @@
+/* Global Styling */
+body {
+    background-color: #f7f4f1; /* Warna krem lembut */
+    font-family: 'Helvetica Neue', sans-serif;
+    color: #4e4b50; /* Warna abu gelap */
+}
+
+/* Navbar Styling */
+.navbar {
+    background-color: #a180a8; /* Warna ungu muda */
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-brand {
+    color: #f7f4f1 !important; /* Putih lembut */
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.navbar-nav .nav-link {
+    color: #f7f4f1 !important;
+    font-size: 18px;
+}
+
+.navbar-nav .nav-link:hover {
+    background-color: #c29fcd; /* Lilac sedikit lebih terang */
+    border-radius: 5px;
+}
+
+/* Jumbotron Styling */
+.jumbotron {
+    background-color: #a180a8; /* Ungu muda */
+    color: white;
+    padding: 40px 20px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.jumbotron h1 {
+    font-size: 42px;
+    font-weight: bold;
+    color: #ffffff;
+}
+
+.jumbotron p {
+    font-size: 18px;
+    font-weight: lighter;
+    color: #f7eaf0; /* Sentuhan merah muda sangat lembut */
+}
+
+/* Custom Search Form */
+.search-container .input-group {
+    max-width: 800px;
+    width: 100%;
+    margin: 0 auto 20px auto;
+}
+
+.search-container .form-control {
+    border-radius: 30px 0 0 30px;
+    box-shadow: none;
+    border: 1px solid #a180a8; /* Warna ungu muda */
+    flex: 1; /* Tambahkan flex untuk memastikan input mengambil sisa ruang */
+}
+
+.search-container .btn {
+    border-radius: 0 30px 30px 0;
+    background-color: #a180a8; /* Warna ungu muda */
+    color: white;
+    border: 1px solid #a180a8;
+    padding: 10px 20px; /* Tambahkan padding yang lebih luas */
+    flex-shrink: 0; /* Pastikan tombol tidak mengecil mengikuti input */
+}
+
+.search-container .btn:hover {
+    background-color: #c29fcd; /* Lilac yang lebih terang */
+}
+
+/* Filter Form Styling */
+.filter-container {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.filter-container select {
+    border-radius: 30px;
+    padding: 10px;
+    border: 1px solid #a180a8;
+    background-color: #ffffff;
+    color: #4e4b50;
+}
+
+.filter-container .btn-primary {
+    border-radius: 30px;
+    padding: 10px 20px;
+    background-color: #a180a8;
+    border: none;
+}
+
+.filter-container .btn-primary:hover {
+    background-color: #c29fcd;
+}
+
+/* Cards Styling */
+.card {
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+    margin-bottom: 30px;
+    background-color: #ffffff;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.card-body {
+    padding: 20px;
+}
+
+.card-title {
+    font-size: 20px;
+    font-weight: bold;
+    color: #4e4b50;
+}
+
+.card-text {
+    font-size: 16px;
+    color: #6c757d;
+}
+
+/* Button Styling */
+.btn-primary {
+    background-color: #a180a8;
+    border: none;
+    border-radius: 30px;
+}
+
+.btn-primary:hover {
+    background-color: #c29fcd;
+}
+
+.btn-success {
+    background-color: #f3d34a; /* Warna kuning cerah untuk kontras */
+    border: none;
+    border-radius: 30px;
+}
+
+.btn-success:hover {
+    background-color: #e2b945; /* Kuning lebih lembut */
+}
+
+.btn-warning {
+    background-color: #f7a8a8; /* Merah muda lembut */
+    border: none;
+    border-radius: 30px;
+    color: white;
+}
+
+.btn-warning:hover {
+    background-color: #f5b5b5; /* Merah muda yang lebih cerah */
+    color: white;
+}
+
+/* Footer Styling */
+footer {
+    background-color: #a180a8;
+    color: white;
+    padding: 20px 0;
+    text-align: center;
+}
+
+footer p {
+    margin: 0;
+    font-size: 14px;
+    color: #f7f4f1; /* Putih lembut */
+}

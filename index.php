@@ -51,18 +51,13 @@ if (!$result) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Arsip Keputusan & Surat Tugas</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        /* Custom style to center the search form */
-        .search-container {
-            display: flex;
-            justify-content: center;
-            margin: 30px 0;
-        }
-    </style>
+    <link rel="stylesheet" href="index.css">
+
+    
 </head>
 <body>
      <!-- Navbar -->
-     <nav class="navbar navbar-expand-lg navbar-light bg-primary">
+     <nav class="navbar navbar-expand-lg navbar-light">
         <div class="container-fluid">
             <a class="navbar-brand" href="#">PolnepArsipin</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -163,7 +158,7 @@ if (!$result) {
     </div>
 
     <!-- Footer -->
-    <footer class="bg-primary text-center py-4">
+    <footer class="text-center py-4">
         <p>&copy; 2024 Arsip Keputusan & Surat Tugas</p>
     </footer>
 
