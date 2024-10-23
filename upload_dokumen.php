@@ -100,10 +100,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <label for="file" class="form-label">File Dokumen</label>
                 <input type="file" name="file" class="form-control" required>
             </div>
-            <button type="submit" class="btn btn-primary">Unggah Dokumen</button>
-        </form>
-
-        <a href="dashboard_admin.php" class="btn btn-secondary mt-3">Kembali ke Dashboard</a>
-    </div>
+            <div class="d-flex justify-content-between mt-3">
+            <button type="submit" class="btn btn-primary mt-3">Unggah</button>
+            <a href="dashboard_admin.php" class="btn btn-secondary mt-3">Kembali</a>
+        </div>
+    </form>
+</div>
 </body>
 </html>

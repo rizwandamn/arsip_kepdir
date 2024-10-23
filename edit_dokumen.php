@@ -135,11 +135,12 @@ $tahun_akademik = $document['tahun_akademik'] ?? '';
         <label for="file" class="form-label">File (jika ingin mengganti)</label>
         <input type="file" class="form-control" id="file" name="file">
     </div>
-    <button type="submit" class="btn btn-primary">Perbarui Dokumen</button>
-</form>
-
-
-        <a href="dashboard_admin.php" class="btn btn-secondary mt-3">Kembali ke Dashboard</a>
+    <div class="d-flex justify-content-between mt-3">
+        <button type="submit" class="btn btn-primary mt-3">Perbarui</button>
+        <a href="dashboard_admin.php" class="btn btn-secondary mt-3">Kembali</a>
     </div>
+</form>
+</div>
+
 </body>
 </html>

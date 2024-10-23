@@ -77,11 +77,13 @@ switch ($role) {
                 <p class="card-text"><strong>Diunggah oleh:</strong> <?php echo htmlspecialchars($dokumen['uploaded_by']); ?></p>
                 <p class="card-text"><strong>Dibuat pada:</strong> <?php echo htmlspecialchars($dokumen['created_at']); ?></p>
                 <p class="card-text"><strong>Terakhir diperbarui pada:</strong> <?php echo htmlspecialchars($dokumen['updated_at']); ?></p>
-                <a href="<?php echo htmlspecialchars($dokumen['file_path']); ?>" class="btn btn-primary" download>Unduh Dokumen</a>
+
+                <!-- Button Container -->
+                 <div class="d-flex justify-content-between mt-3">
+                <a href="<?php echo htmlspecialchars($dokumen['file_path']); ?>" class="btn btn-primary mt-3" download>Unduh</a>
+                <a href="<?= $dashboard_url; ?>" class="btn btn-secondary mt-3">Kembali</a>
             </div>
         </div>
-
-        <a href="<?= $dashboard_url; ?>" class="btn btn-secondary mt-3">Kembali ke Dashboard</a>
     </div>
 </body>
 </html>
