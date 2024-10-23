@@ -1,0 +1,98 @@
+/* dashboard_admin.css */
+
+/* Basic reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Body styling */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #5a1e70; /* Soft background color */
+    color: #333; /* Text color */
+}
+
+/* Container styling */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    border-radius: 8px;
+    background-color: #ffcc80; /* White background for the container */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Header styling */
+h1 {
+    color: #5a1e70; /* Soft pink color for headers */
+    margin-bottom: 20px;
+}
+
+/* Alert message styling */
+.alert {
+    border-radius: 4px;
+}
+
+/* Form styling */
+.form-select, .form-control {
+    border: 1px solid #b58399; /* Pink border */
+    border-radius: 4px;
+}
+
+.form-select:focus, .form-control:focus {
+    border-color: #6f2c91; /* Darker purple for focus */
+    box-shadow: 0 0 5px rgba(111, 44, 145, 0.5);
+}
+
+/* Button styling */
+.btn {
+    border-radius: 4px;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.btn-primary {
+    background-color: #6f2c91; /* Dark purple */
+    border: none;
+}
+
+.btn-primary:hover {
+    background-color: #5a1e70; /* Darker purple on hover */
+    transform: translateY(-2px);
+}
+
+.btn-info {
+    background-color: #90c5ed; /* Light blue for preview */
+}
+
+.btn-success {
+    background-color: #b8e1a7; /* Light green for download */
+}
+
+.btn-warning {
+    background-color: #ffcc80; /* Light orange for edit */
+}
+
+.btn-danger {
+    background-color: #e57373; /* Red for delete */
+}
+
+/* Table styling */
+.table {
+    margin-top: 20px;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: #f9f9f9; /* Light grey for alternating rows */
+}
+
+.table-striped tbody tr:hover {
+    background-color: #e0e0e0; /* Light hover effect */
+}
+
+/* Footer styling */
+.text-center {
+    margin-top: 20px;
+    font-style: italic;
+}
