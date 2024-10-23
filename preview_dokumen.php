@@ -4,11 +4,7 @@ require 'db.php'; // Koneksi ke database
 require 'session.php';
 // checkLogin() ;
 
-// Pastikan pengguna sudah login
-if (!isset($_SESSION['role'])) {
-    header("Location: login.php");
-    exit();
-}
+
 
 // Ambil ID dokumen dari URL
 if (isset($_GET['id'])) {
@@ -35,7 +31,8 @@ if (isset($_GET['id'])) {
 }
 
 // Tentukan URL kembali sesuai dengan role pengguna
-$role = $_SESSION['role'];
+// Tentukan URL kembali sesuai dengan role pengguna, jika ada
+$role = isset($_SESSION['role']) ? $_SESSION['role'] : 'guest'; // Atur default jika belum login
 $dashboard_url = '';
 
 // Tentukan URL kembali sesuai dengan halaman yang diakses
