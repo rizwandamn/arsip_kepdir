@@ -21,7 +21,7 @@ mysqli_stmt_execute($stmt);
 $result = mysqli_stmt_get_result($stmt);
 $document = mysqli_fetch_assoc($result);
 
-//Proses pengeditan dokumen
+// Proses pengeditan dokumen
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $title = $_POST['title'] ?? null;
     $deskripsi = $_POST['deskripsi'] ?? null;
@@ -45,7 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Query untuk memperbarui data dokumen
     $query = "UPDATE dokumen SET title = ?, deskripsi = ?, kategori = ?, jenis = ?, no_surat = ?, tanggal_surat = ?, tahun_akademik = ?, updated_at = NOW() WHERE id_dokumen = ?";
     $stmt = mysqli_prepare($conn, $query);
-    
+
     // Bind parameter untuk query
     if ($file_path) {
         $query = "UPDATE dokumen SET title = ?, deskripsi = ?, file_path = ?, kategori = ?, jenis = ?, no_surat = ?, tanggal_surat = ?, tahun_akademik = ?, updated_at = NOW() WHERE id_dokumen = ?";
@@ -73,7 +73,7 @@ $no_surat = $document['no_surat'] ?? '';
 $tanggal_surat = $document['tanggal_surat'] ?? '';
 $kategori = $document['kategori'] ?? '';
 $jenis = $document['jenis'] ?? '';
-$tahun_akademik = $document['tahun_akademik'] ?? '';
+$tahun_akademik_selected = $document['tahun_akademik'] ?? '';
 
 ?>
 
@@ -87,60 +87,69 @@ $tahun_akademik = $document['tahun_akademik'] ?? '';
 </head>
 <body>
 <div class="container">
-        <h1 class="mt-4">Edit Dokumen</h1>
-        <form action="" method="post" enctype="multipart/form-data">
-    <div class="mb-3">
-        <label for="title" class="form-label">Judul</label>
-        <input type="text" class="form-control" id="title" name="title" value="<?php echo htmlspecialchars($title); ?>" required>
-    </div>
-    <div class="mb-3">
-        <label for="deskripsi" class="form-label">Deskripsi</label>
-        <textarea class="form-control" id="deskripsi" name="deskripsi" required><?php echo htmlspecialchars($deskripsi); ?></textarea>
-    </div>
-    <div class="mb-3">
-        <label for="no_surat" class="form-label">No Surat</label>
-        <input type="text" class="form-control" id="no_surat" name="no_surat" value="<?php echo htmlspecialchars($no_surat); ?>" required>
-    </div>
-    <div class="mb-3">
-        <label for="tanggal_surat" class="form-label">Tanggal Surat</label>
-        <input type="date" class="form-control" id="tanggal_surat" name="tanggal_surat" value="<?php echo htmlspecialchars($tanggal_surat); ?>" required>
-    </div>
-    <div class="mb-3">
-        <label for="kategori" class="form-label">Kategori</label>
-        <select class="form-select" id="kategori" name="kategori" required>
-            <option value="">Pilih Kategori</option>
-            <option value="pendidikan" <?php echo ($kategori == 'pendidikan') ? 'selected' : ''; ?>>Pendidikan</option>
-            <option value="penelitian" <?php echo ($kategori == 'penelitian') ? 'selected' : ''; ?>>Penelitian</option>
-            <option value="pengabdian" <?php echo ($kategori == 'pengabdian') ? 'selected' : ''; ?>>Pengabdian</option>
-            <option value="lainnya" <?php echo ($kategori == 'lainnya') ? 'selected' : ''; ?>>Lainnya</option>
-        </select>
-    </div>
-    <div class="mb-3">
-        <label for="jenis" class="form-label">Jenis</label>
-        <select class="form-select" id="jenis" name="jenis" required>
-            <option value="">Pilih Jenis</option>
-            <option value="surat_keputusan" <?php echo ($jenis == 'surat_keputusan') ? 'selected' : ''; ?>>Surat Keputusan</option>
-            <option value="surat_tugas" <?php echo ($jenis == 'surat_tugas') ? 'selected' : ''; ?>>Surat Tugas</option>
-        </select>
-    </div>
-    <div class="mb-3">
-        <label for="tahun_akademik" class="form-label">Tahun Akademik</label>
-        <select class="form-select" id="tahun_akademik" name="tahun_akademik" required>
-            <option value="">Pilih Tahun Akademik</option>
-            <option value="ganjil" <?php echo ($tahun_akademik == 'ganjil') ? 'selected' : ''; ?>>Ganjil</option>
-            <option value="genap" <?php echo ($tahun_akademik == 'genap') ? 'selected' : ''; ?>>Genap</option>
-        </select>
-    </div>
-    <div class="mb-3">
-        <label for="file" class="form-label">File (jika ingin mengganti)</label>
-        <input type="file" class="form-control" id="file" name="file">
-    </div>
-    <div class="d-flex justify-content-between mt-3">
-        <button type="submit" class="btn btn-primary mt-3">Perbarui</button>
-        <a href="dashboard_admin.php" class="btn btn-secondary mt-3">Kembali</a>
-    </div>
-</form>
+    <h1 class="mt-4">Edit Dokumen</h1>
+    <form action="" method="post" enctype="multipart/form-data">
+        <div class="mb-3">
+            <label for="title" class="form-label">Judul</label>
+            <input type="text" class="form-control" id="title" name="title" value="<?php echo htmlspecialchars($title); ?>" required>
+        </div>
+        <div class="mb-3">
+            <label for="deskripsi" class="form-label">Deskripsi</label>
+            <textarea class="form-control" id="deskripsi" name="deskripsi" required><?php echo htmlspecialchars($deskripsi); ?></textarea>
+        </div>
+        <div class="mb-3">
+            <label for="no_surat" class="form-label">No Surat</label>
+            <input type="text" class="form-control" id="no_surat" name="no_surat" value="<?php echo htmlspecialchars($no_surat); ?>" required>
+        </div>
+        <div class="mb-3">
+            <label for="tanggal_surat" class="form-label">Tanggal Surat</label>
+            <input type="date" class="form-control" id="tanggal_surat" name="tanggal_surat" value="<?php echo htmlspecialchars($tanggal_surat); ?>" required>
+        </div>
+        <div class="mb-3">
+            <label for="kategori" class="form-label">Kategori</label>
+            <select class="form-select" id="kategori" name="kategori" required>
+                <option value="">Pilih Kategori</option>
+                <option value="pendidikan" <?php echo ($kategori == 'pendidikan') ? 'selected' : ''; ?>>Pendidikan</option>
+                <option value="penelitian" <?php echo ($kategori == 'penelitian') ? 'selected' : ''; ?>>Penelitian</option>
+                <option value="pengabdian" <?php echo ($kategori == 'pengabdian') ? 'selected' : ''; ?>>Pengabdian</option>
+                <option value="lainnya" <?php echo ($kategori == 'lainnya') ? 'selected' : ''; ?>>Lainnya</option>
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="jenis" class="form-label">Jenis</label>
+            <select class="form-select" id="jenis" name="jenis" required>
+                <option value="">Pilih Jenis</option>
+                <option value="surat_keputusan" <?php echo ($jenis == 'surat_keputusan') ? 'selected' : ''; ?>>Surat Keputusan</option>
+                <option value="surat_tugas" <?php echo ($jenis == 'surat_tugas') ? 'selected' : ''; ?>>Surat Tugas</option>
+            </select>
+        </div>
+        <!-- Dropdown Tahun Akademik -->
+        <div class="mb-3">
+            <label for="tahun_akademik" class="form-label">Tahun Akademik</label>
+            <select name="tahun_akademik" class="form-select" required>
+                <option value="">Pilih Tahun Akademik</option>
+                <?php
+                $startYear = 2024;
+                $numberOfYears = 7; // Jumlah tahun akademik yang ingin ditampilkan
+                for ($i = 0; $i < $numberOfYears; $i++) {
+                    $year = $startYear + $i;
+                    $ganjil = "Ganjil $year";
+                    $genap = "Genap $year";
+                    echo "<option value='$ganjil' " . ($tahun_akademik_selected == $ganjil ? 'selected' : '') . ">Ganjil $year</option>";
+                    echo "<option value='$genap' " . ($tahun_akademik_selected == $genap ? 'selected' : '') . ">Genap $year</option>";
+                }
+                ?>
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="file" class="form-label">File (jika ingin mengganti)</label>
+            <input type="file" class="form-control" id="file" name="file">
+        </div>
+        <div class="d-flex justify-content-between mt-3">
+            <button type="submit" class="btn btn-primary mt-3">Perbarui</button>
+            <a href="dashboard_admin.php" class="btn btn-secondary mt-3">Kembali</a>
+        </div>
+    </form>
 </div>
-
 </body>
 </html>

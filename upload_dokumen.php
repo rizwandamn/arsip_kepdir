@@ -89,13 +89,24 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     <option value="surat_tugas">Surat Tugas</option>
                 </select>
             </div>
-            <div class="mb-3">
-                <label for="tahun_akademik" class="form-label">Tahun Akademik</label>
-                <select name="tahun_akademik" class="form-select" required>
-                    <option value="ganjil">Ganjil</option>
-                    <option value="genap">Genap</option>
-                </select>
-            </div>
+            <!-- Dropdown Tahun Akademik -->
+<div class="mb-3">
+    <label for="tahun_akademik" class="form-label">Tahun Akademik</label>
+    <select name="tahun_akademik" class="form-select" required>
+        <option value="">Pilih Tahun Akademik</option>
+        <?php
+        $startYear = 2024; // Tahun awal
+        $numberOfYears = 7; // Jumlah tahun akademik yang ingin ditampilkan
+        for ($i = 0; $i < $numberOfYears; $i++) {
+            $year = $startYear + $i;
+            $ganjil = "Ganjil $year";
+            $genap = "Genap $year";
+            echo "<option value='$ganjil'>$ganjil</option>";
+            echo "<option value='$genap'>$genap</option>";
+        }
+        ?>
+    </select>
+</div>
             <div class="mb-3">
                 <label for="file" class="form-label">File Dokumen</label>
                 <input type="file" name="file" class="form-control" required>
