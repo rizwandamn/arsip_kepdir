@@ -1,45 +1,39 @@
 <?php
 session_start();
-require 'db.php'; // Koneksi ke database
+require 'db.php'; 
 require 'session.php';
 checkLogin();
 
-// Pastikan admin sudah login
 if (!isset($_SESSION['role']) || $_SESSION['role'] != 'admin') {
     header("Location: login.php");
     exit();
 }
 
-// Siapkan variabel filter
 $kategori_filter = isset($_POST['kategori']) ? $_POST['kategori'] : '';
 $jenis_filter = isset($_POST['jenis']) ? $_POST['jenis'] : '';
 $search_term = isset($_POST['search']) ? $_POST['search'] : '';
 
-// Cek apakah ada pencarian atau filter
 $is_searching = !empty($search_term) || !empty($kategori_filter) || !empty($jenis_filter);
 
-// Query untuk mengambil semua dokumen dengan filter
-$query = "SELECT * FROM dokumen WHERE 1=1"; // 1=1 untuk memudahkan penambahan kondisi
+$query = "SELECT * FROM dokumen WHERE 1=1";
 
-// Tambahkan filter kategori jika ada
 if ($kategori_filter) {
     $query .= " AND kategori = '$kategori_filter'";
 }
-
-// Tambahkan filter jenis jika ada
 if ($jenis_filter) {
     $query .= " AND jenis = '$jenis_filter'";
 }
-
-// Tambahkan pencarian
 if ($search_term) {
     $query .= " AND (title LIKE '%$search_term%' OR no_surat LIKE '%$search_term%')";
 }
 
-$query .= " ORDER BY created_at DESC"; // Urutkan berdasarkan tanggal
+$query .= " ORDER BY created_at DESC"; 
 
 $result = mysqli_query($conn, $query);
 
+$unverifiedQuery = "SELECT COUNT(*) as count FROM pengguna WHERE is_verified = 0";
+$unverifiedResult = mysqli_query($conn, $unverifiedQuery);
+$unverifiedCount = mysqli_fetch_assoc($unverifiedResult)['count'];
 ?>
 
 <!DOCTYPE html>
@@ -50,20 +44,25 @@ $result = mysqli_query($conn, $query);
     <title>Dashboard Admin</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="dashboard_admin.css">
-
 </head>
 <body>
     <div class="container">
         <h1 class="mt-4">Dashboard Admin</h1>
 
-        <!-- Menampilkan pesan keberhasilan -->
+        <!-- Notifikasi pengguna yang perlu diverifikasi -->
+        <?php if ($unverifiedCount > 0): ?>
+            <div class="alert alert-warning d-flex justify-content-between align-items-center">
+                <span><strong>Pemberitahuan:</strong> Ada <?= $unverifiedCount; ?> pengguna yang perlu diverifikasi.</span>
+                <a href="verify.php" class="btn btn-outline-primary btn-sm">Verifikasi Sekarang</a>
+            </div>
+        <?php endif; ?>
+
         <?php if (isset($_GET['message'])): ?>
             <div class="alert alert-success">
                 <?= htmlspecialchars($_GET['message']); ?>
             </div>
         <?php endif; ?>
 
-        <!-- Form sortir kategori, jenis dokumen dan pencarian -->
         <form method="post" action="">
             <div class="row mb-4">
                 <div class="col">
@@ -91,10 +90,8 @@ $result = mysqli_query($conn, $query);
             </div>
         </form>
 
-        <!-- Tombol tambah dokumen -->
         <a href="upload_dokumen.php" class="btn btn-primary mb-3">Tambah Dokumen</a>
 
-        <!-- Tabel daftar dokumen -->
         <table class="table table-striped">
             <thead>
                 <tr>
@@ -118,7 +115,6 @@ $result = mysqli_query($conn, $query);
                         <td><?= ucfirst($row['kategori']); ?></td>
                         <td><?= ucfirst($row['jenis']); ?></td>
                         <td>
-                            <!-- Tombol aksi -->
                             <a href="preview_dokumen.php?id=<?= $row['id_dokumen']; ?>&from=admin" class="btn btn-info btn-sm">Preview</a>
                             <a href="download_dokumen.php?id=<?= $row['id_dokumen']; ?>" class="btn btn-success btn-sm">Download</a>
                             <a href="edit_dokumen.php?id=<?= $row['id_dokumen']; ?>" class="btn btn-warning btn-sm">Edit</a>
@@ -134,7 +130,6 @@ $result = mysqli_query($conn, $query);
             </tbody>
         </table>
 
-        <!-- Tombol logout -->
         <a href="logout.php" class="btn btn-danger">Logout</a>
     </div>
 </body>

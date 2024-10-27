@@ -14,23 +14,51 @@ require 'db.php'; // Pastikan untuk menyesuaikan dengan nama file koneksi Anda
 // Inisialisasi variabel pesan
 $message = "";
 
+//Nomor WhatsApp Admin
+$admin_whatsapp_number = "62895348381570";
+
 // Proses pendaftaran pengguna
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Ambil dan amankan input pengguna
     $username = mysqli_real_escape_string($conn, $_POST['username']);
     $password = mysqli_real_escape_string($conn, $_POST['password']);
     $role = mysqli_real_escape_string($conn, $_POST['role']); // 'admin' atau 'dosen'
+    $whatsapp = mysqli_real_escape_string($conn, $_POST['whatsapp']); // Nomor WhatsApp
 
-    // Hash password
-    $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+    // Cek apakah sudah ada akun admin yang terdaftar
+    if ($role === 'admin') {
+        $adminCheckQuery = "SELECT COUNT(*) as count FROM pengguna WHERE role = 'admin'";
+        $adminCheckResult = mysqli_query($conn, $adminCheckQuery);
+        $adminCount = mysqli_fetch_assoc($adminCheckResult)['count'];
 
-    // Insert pengguna ke database
-    $sql = "INSERT INTO pengguna (username, password, role) VALUES ('$username', '$hashed_password', '$role')";
-    
-    if (mysqli_query($conn, $sql)) {
-        $message = "User berhasil terdaftar!";
+        if ($adminCount > 0) {
+            $message = "Hanya satu akun admin yang diperbolehkan.";
+        } else {
+            // Hash password
+            $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+
+            // Insert pengguna ke database
+            $sql = "INSERT INTO pengguna (username, password, role, is_verified, whatsapp) VALUES ('$username', '$hashed_password', '$role', 1, '$whatsapp')";
+
+            if (mysqli_query($conn, $sql)) {
+                $message = "Admin berhasil terdaftar!";
+            } else {
+                $message = "Error: " . mysqli_error($conn);
+            }
+        }
     } else {
-        $message = "Error: " . mysqli_error($conn);
+        // Hash password
+        $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+
+        // Insert pengguna ke database, dengan is_verified = 0 untuk pengguna yang membutuhkan verifikasi
+        $sql = "INSERT INTO pengguna (username, password, role, is_verified, whatsapp) VALUES ('$username', '$hashed_password', '$role', 0, '$whatsapp')";
+
+        if (mysqli_query($conn, $sql)) {
+            $message = "Registrasi berhasil! Silakan hubungi admin melalui WhatsApp untuk verifikasi akun Anda :";
+            $message .= "<a href='https://wa.me/$admin_whatsapp_number?text=Halo%20Admin,%20saya%20butuh%20verifikasi%20akun%20saya.' target='_blank'> 0895346381570</a> .";
+        } else {
+            $message = "Error: " . mysqli_error($conn);
+        }
     }
 }
 ?>
@@ -47,7 +75,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <div class="container">
         <h1 class="mt-4">Registrasi Pengguna</h1>
         <!-- Tampilkan pesan jika ada -->
-        <?php if($message): ?>
+        <?php if ($message): ?>
             <div class="alert alert-info"><?php echo $message; ?></div>
         <?php endif; ?>
 
@@ -66,6 +94,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <option value="admin">Admin</option>
                     <option value="dosen">Dosen</option>
                 </select>
+            </div>
+            <div class="mb-3">
+                <label for="whatsapp" class="form-label">Nomor WhatsApp</label>
+                <input type="text" name="whatsapp" class="form-control" required>
             </div>
             <button type="submit" class="btn btn-primary">Daftar</button>
         </form>

@@ -13,31 +13,35 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = mysqli_real_escape_string($conn, $_POST['username']);
     $password = mysqli_real_escape_string($conn, $_POST['password']);
 
-    // Query untuk mencari user berdasarkan username dan password
-    $sql = "SELECT * FROM pengguna WHERE username = '$username' ;
-    -- AND password = '$password'";
+    // Query untuk mencari user berdasarkan username
+    $sql = "SELECT * FROM pengguna WHERE username = '$username'";
     $result = mysqli_query($conn, $sql);
     $row = mysqli_fetch_assoc($result);
 
     if ($row) {
-         // Jika user ditemukan, cek password menggunakan password_verify
-         if (password_verify($password, $row['password'])) {
-        // Jika user ditemukan, cek rolenya
-        $_SESSION['username'] = $row['username'];
-        $_SESSION['role'] = $row['role'];
-        $_SESSION['id_user'] = $row['id_user'];
+        // Jika user ditemukan, cek password menggunakan password_verify
+        if (password_verify($password, $row['password'])) {
+            // Cek apakah pengguna sudah terverifikasi
+            if ($row['is_verified'] == 0) {
+                $error = "Akun Anda belum terverifikasi. Silakan hubungi admin melalui WhatsApp untuk verifikasi akun Anda.";
+            } else {
+                // Jika pengguna terverifikasi, simpan data di session
+                $_SESSION['username'] = $row['username'];
+                $_SESSION['role'] = $row['role'];
+                $_SESSION['id_user'] = $row['id_user'];
 
-        // Redirect berdasarkan role
-        if ($row['role'] == 'admin') {
-            header("Location: dashboard_admin.php");
-        } elseif ($row['role'] == 'dosen') {
-            header("Location: dashboard_dosen.php");
+                // Redirect ke dashboard berdasarkan peran
+                if ($row['role'] == 'admin') {
+                    header("Location: dashboard_admin.php");
+                } elseif ($row['role'] == 'dosen') {
+                    header("Location: dashboard_dosen.php");
+                }
+                exit();
+            }
+        } else {
+            // Jika password salah
+            $error = "Username atau password salah!";
         }
-        exit();
-    } else {
-        // Jika password salah
-        $error = "Username atau password salah!";
-    }
     } else {
         // Jika username tidak ditemukan
         $error = "Username atau password salah!";
@@ -58,7 +62,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <div class="row justify-content-center">
             <div class="col-md-4">
                 <h3 class="text-center mt-5">Login</h3>
-                <?php if($error): ?>
+                <?php if ($error): ?>
                     <div class="alert alert-danger">
                         <?php echo $error; ?>
                     </div>
@@ -77,7 +81,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                 <!-- Opsi Registrasi -->
                 <p class="mt-3 text-center">Belum punya akun? <a href="registrasi.php">Daftar di sini</a></p>
-                
             </div>
         </div>
     </div>
