@@ -1,54 +1,3 @@
-<?php
-// Mulai session
-session_start();
-
-// Sertakan file koneksi database
-require_once 'db.php';
-require 'session.php';
-// Inisialisasi variabel pesan error
-$error = "";
-
-// Cek apakah form login sudah di-submit
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $username = mysqli_real_escape_string($conn, $_POST['username']);
-    $password = mysqli_real_escape_string($conn, $_POST['password']);
-
-    // Query untuk mencari user berdasarkan username
-    $sql = "SELECT * FROM pengguna WHERE username = '$username'";
-    $result = mysqli_query($conn, $sql);
-    $row = mysqli_fetch_assoc($result);
-
-    if ($row) {
-        // Jika user ditemukan, cek password menggunakan password_verify
-        if (password_verify($password, $row['password'])) {
-            // Cek apakah pengguna sudah terverifikasi
-            if ($row['is_verified'] == 0) {
-                $error = "Akun Anda belum terverifikasi. Silakan hubungi admin melalui WhatsApp untuk verifikasi akun Anda.";
-            } else {
-                // Jika pengguna terverifikasi, simpan data di session
-                $_SESSION['username'] = $row['username'];
-                $_SESSION['role'] = $row['role'];
-                $_SESSION['id_user'] = $row['id_user'];
-
-                // Redirect ke dashboard berdasarkan peran
-                if ($row['role'] == 'admin') {
-                    header("Location: dashboard_admin.php");
-                } elseif ($row['role'] == 'dosen') {
-                    header("Location: dashboard_dosen.php");
-                }
-                exit();
-            }
-        } else {
-            // Jika password salah
-            $error = "Username atau password salah!";
-        }
-    } else {
-        // Jika username tidak ditemukan
-        $error = "Username atau password salah!";
-    }
-}
-?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -62,29 +11,78 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <div class="row justify-content-center">
             <div class="col-md-4">
                 <h3 class="text-center mt-5">Login</h3>
-                <?php if ($error): ?>
-                    <div class="alert alert-danger">
-                        <?php echo $error; ?>
-                    </div>
-                <?php endif; ?>
-                <form method="post" action="login.php">
+
+                <form method="post">
                     <div class="mb-3">
                         <label for="username" class="form-label">Username</label>
-                        <input type="text" class="form-control" id="username" name="username" required>
+                        <input type="text" class="form-control" id="id" name="id" required>
                     </div>
                     <div class="mb-3">
                         <label for="password" class="form-label">Password</label>
                         <input type="password" class="form-control" id="password" name="password" required>
                     </div>
-                    <button type="submit" class="btn btn-primary w-100">Login</button>
+                    <button type="submit" id="submit" class="btn btn-primary w-100">Login</button>
                 </form>
 
                 <!-- Opsi Registrasi -->
                 <p class="mt-3 text-center">Belum punya akun? <a href="registrasi.php">Daftar di sini</a></p>
+
             </div>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function meong2(role) {
+            if (role == 'mahasiswa') {
+                localStorage.clear();
+            } else if (role == 'dosen') {
+                window.location.href = 'dashboard_dosen.php';
+            } else {
+                window.location.href = 'dashboard_admin.php';
+            }
+        }
+        if (localStorage.getItem('auth_token') != null) {
+            meong2(localStorage.getItem('role'));
+        }
+        async function meong(id, pw) {
+            const response = await fetch('https://apiteam.v-project.my.id/api/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        'id': id,
+                        'password': pw
+                    })
+                });
+
+                // Mengecek apakah response berhasil
+                if (response.ok) {
+                    const arr = await response.json();
+                    console.log(arr)
+                    // Jika ada token dalam data, simpan ke localStorage dan sessionStorage
+                    if (arr.data.token) {
+                        localStorage.setItem('auth_token', arr.data.token);
+                        localStorage.setItem('nama', arr.data.nama);
+                        localStorage.setItem('role', arr.data.role);
+                        alert('Login berhasil!');
+                        meong2(arr.data.token);
+                    } else {
+                        alert('Login gagal: Token tidak ditemukan.');
+                    }
+                } else {
+                    alert('Login gagal: Terjadi kesalahan.');
+                }
+        }
+
+        document.getElementById('submit').addEventListener('click', function (e) {
+            e.preventDefault();
+            let id = document.getElementById('id').value;
+            let pw = document.getElementById('password').value;
+
+            meong(id, pw);
+        });
+    </script>
 </body>
 </html>
