@@ -10,6 +10,14 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] != 'admin') {
     exit();
 }
 
+// Inisialisasi cache dengan Redis
+$cache = new Redis(); 
+$cache->connect("127.0.0.1", 6379);;
+
+if (!$cache->ping()) {
+    echo "<div class='alert alert-danger'>Redis tidak terhubung!</div>";
+}
+
 // Proses pengunggahan dokumen
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $title = $_POST['title'];
@@ -33,7 +41,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         mysqli_stmt_bind_param($stmt, 'ssssssssi', $title, $deskripsi, $file_path, $kategori, $jenis, $no_surat, $tanggal_surat, $tahun_akademik, $uploaded_by);
 
         if (mysqli_stmt_execute($stmt)) {
+            // Ambil ID dokumen yang baru diupload menggunakan koneksi
+            $newDocumentId = mysqli_insert_id($conn); // Mendapatkan ID dokumen baru
+        
+        
+            // Set notifikasi di cache bahwa dokumen baru telah diunggah
+            $cache->set('new_document', 'Ada dokumen baru yang diupload oleh admin. ID Dokumen: ' . $newDocumentId);
+            
+            // Simpan ID dokumen baru di Redis
+            $cache->rPush('new_document_ids', $newDocumentId); // Menyimpan ID ke dalam list
             echo "<div class='alert alert-success'>Dokumen berhasil diunggah!</div>";
+
         } else {
             echo "<div class='alert alert-danger'>Gagal mengunggah dokumen: " . mysqli_error($conn) . "</div>";
         }

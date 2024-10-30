@@ -16,6 +16,41 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] != 'dosen') {
     exit();
 }
 
+// Inisialisasi cache dengan Redis
+$cache = new Redis(); 
+$cache->connect("127.0.0.1", 6379);
+
+// Cek apakah ada notifikasi untuk dosen
+$notification = $cache->get('new_document');
+if ($notification) {
+    echo "<div class='alert alert-info'>$notification</div>";
+
+    // Ambil ID dokumen baru dari Redis
+    $newDocumentIds = $cache->lRange('new_document_ids', 0, -1); // Ambil semua ID dokumen baru
+    $cache->unlink('new_document'); // Hapus notifikasi setelah ditampilkan, agar hanya muncul sekali
+
+    // Tampilkan daftar dokumen baru
+    if (!empty($newDocumentIds)) {
+        echo "<h5 class='text-white ms-3'>Dokumen Baru yang Diupload:</h5><ul class='list-unstyled text-white ms-3'>";
+        foreach ($newDocumentIds as $id) {
+            // Ambil detail dokumen dari database
+            $docQuery = "SELECT title FROM dokumen WHERE id_dokumen = ?";
+            $docStmt = mysqli_prepare($conn, $docQuery);
+            mysqli_stmt_bind_param($docStmt, 'i', $id);
+            mysqli_stmt_execute($docStmt);
+            $docResult = mysqli_stmt_get_result($docStmt);
+            $docRow = mysqli_fetch_assoc($docResult);
+            // Buat tautan ke halaman preview atau download
+        echo "<li><a href='preview_dokumen.php?id=$id' class='text-white'>" . htmlspecialchars($docRow['title']) . "</a> (ID: $id)</li>";
+        }
+        echo "</ul>";
+
+        // Setelah ditampilkan, Anda dapat menghapus ID dari list jika tidak diperlukan lagi
+        $cache->del('new_document_ids');
+    }
+}
+
+
 // Ambil ID user yang sedang login
 $userId = $_SESSION['id_user'];
 
@@ -84,6 +119,7 @@ if (!$result) {
 
 </head>
 <body>
+
     <div class="container">
         <h1 class="mt-4">Dashboard Dosen</h1>
 
