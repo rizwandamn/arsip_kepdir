@@ -1,7 +1,4 @@
 <?php
-require 'db.php'; // Koneksi ke database
-require 'session.php'; // Mengelola sesi pengguna
-checkLogin(); // Pastikan pengguna sudah login
 
 // Ambil notifikasi untuk pengguna yang sedang login
 $id_user = $_SESSION['id_user'];
